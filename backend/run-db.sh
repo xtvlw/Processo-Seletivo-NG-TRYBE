@@ -1,0 +1,1 @@
+sudo docker run --name db -e POSTGRES_PASSWORD=admin -d postgres

@@ -1,7 +1,8 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Request, Response } from 'express'
+import source from './database/index'
 
 const server = express()
-const port = 4000
+const port: number = 4000
 
 server.get('/', (req: Request, res: Response) => {
     res.send({
@@ -9,6 +10,8 @@ server.get('/', (req: Request, res: Response) => {
     })
 })
 
-server.listen(port, () => {
+server.listen(port, async () => {
     console.log("server is online");
+    source.initialize()
+        .then(() => console.log("database online"))
 })
