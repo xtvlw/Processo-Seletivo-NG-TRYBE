@@ -1,16 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
+import { Account } from "./Account";
 
 @Entity()
 export class Users {
   @PrimaryGeneratedColumn()
-  id: number = 0;
+  id: number
 
   @Column()
-  username: string = "";
+  username: string;
 
   @Column()
-  password: string = "";
+  password: string;
 
-  @Column({ unique: true })
-  accountId: string = "";
+  @OneToOne(() => Account, accountId => accountId.accountId)
+  accountId: Account;
 }

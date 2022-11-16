@@ -1,15 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { Account } from "./Account";
 
 @Entity()
 export class Transactions {
   @PrimaryGeneratedColumn()
   id: number = 0;
 
-  @Column()
-  debitedAccountId: string = "";
+  @ManyToOne(() => Account, debitedAccountId => debitedAccountId.accountId)
+  debitedAccountId: Account
 
-  @Column()
-  creditedAccountId: string = "";
+  @ManyToOne(() => Account, creditedAccountId => creditedAccountId.accountId)
+  creditedAccountId: Account
 
   @Column()
   value: number = 0;
