@@ -1,8 +1,11 @@
 import express, { Request, Response } from "express";
-import { Database } from "./database/databaseManager";
+import { createUser } from "./database";
 
 const server = express();
 const port: number = 4000;
+
+server.use(express.json());
+server.use(express.urlencoded());
 
 server.get("/", (req: Request, res: Response) => {
   res.send({
@@ -10,16 +13,8 @@ server.get("/", (req: Request, res: Response) => {
   });
 });
 
-server.post("/newUser", async (req: Request, res: Response) => {
-  let data = new Database();
-  data.insertDate({
-    table: "Users",
-    saveData: {
-      username: req.body.username,
-      password: req.body.password,
-    }
-  })
-  console.log(data);
+server.post("/newUser", (req, res) => {
+  createUser(req.body);
   res.send({
     status: 200,
     opetation: "done",

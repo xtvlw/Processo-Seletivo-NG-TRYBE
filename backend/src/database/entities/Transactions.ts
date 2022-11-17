@@ -5,13 +5,7 @@ import { Account } from "./Account";
 export class Transactions {
   @PrimaryGeneratedColumn()
   id: number = 0;
-
-  @ManyToOne(() => Account, debitedAccountId => debitedAccountId.accountId)
-  debitedAccountId: Account
-
-  @ManyToOne(() => Account, creditedAccountId => creditedAccountId.accountId)
-  creditedAccountId: Account
-
+  
   @Column()
   value: number = 0;
 
