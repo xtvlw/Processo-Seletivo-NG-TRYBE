@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 
-const signUp = () => {
+const signUp: FC = () => {
   const pageConfig = [
     {
       host: "/userLogin",
@@ -21,26 +21,48 @@ const signUp = () => {
   const [userInfo, setUserInfo] = useState({});
   const [UI, setUI] = useState(pageConfig[0]);
 
-  // functions
-  const sendData = () => {
-    fetch(UI.host, {
-        method: "post",
-        body: JSON.stringify(userInfo)
-    });
-  };
 
   // auxiliar functions
   const changeUI = () => {
     UI.newUser ? setUI(pageConfig[0]) : setUI(pageConfig[1]);
   };
+
+
+  // interfaces
+  interface eventType {
+    target: targetType;
+  }
+  interface targetType {
+    id: string;
+    value: string;
+  }
+  interface UItype {
+    host: string;
+    title: string;
+    footerUser: string;
+    footer: string;
+    newUser: boolean;
+  }
+
+
   // changes anytime that the user update the form
-  const getValues = (event: any) => {
+  const getValues = (event: eventType) => {
     let swap: any = userInfo;
     let elemId = event.target.id;
     swap[elemId] = event.target.value;
     setUserInfo(swap);
     console.log(userInfo);
   };
+
+
+  // functions
+  const sendData: Function = (userConfirm: UItype) => {
+    fetch(userConfirm.host, {
+      method: "post",
+      body: JSON.stringify(userInfo),
+    });
+  };
+
 
   // get from the bootstrap examples
   return (
