@@ -1,0 +1,7 @@
+.input-data  {
+    padding: 5px;
+    height: calc(3.5rem + 2px);
+    width: 100%;
+    border: 1px solid #8f8f9d;
+    border-radius: 5px;
+}

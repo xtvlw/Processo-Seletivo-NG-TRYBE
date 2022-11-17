@@ -1,0 +1,9 @@
+body {
+    width: 90%;
+    margin: auto;
+}
+form  {
+    min-width: 75%;
+    max-width: 350px;
+    margin: auto;
+}

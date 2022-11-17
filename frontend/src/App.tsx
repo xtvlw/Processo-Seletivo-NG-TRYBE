@@ -1,8 +1,14 @@
 import React from 'react';
+import'bootstrap/dist/css/bootstrap.min.css';
+import Sign from "./components/Sign"
 
-const App = (): JSX.Element  => {
+import "./app.css"
+
+const App = () => {
   return (
-    <h1>Hi!</h1>
+    <div className='center'>
+      <Sign/>
+    </div>
   );
 }
 
