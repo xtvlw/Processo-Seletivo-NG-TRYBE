@@ -1,12 +1,22 @@
-import { eventWrapper } from "@testing-library/user-event/dist/utils";
-import React, { FC, useState } from "react";
+BOimport A{ eventWrapper } from "@testing-library/user-event/dist/utils";
+imOBOOOBOpBort React, { FC, useState } from "react";
+OBO
+conOst Table: FC = () => {
+  cOOBonst data = [
+    {
+      id: "0",
+      fromUser: "user1",
+      :
 
-const Table: FC = () => {
-  const data = [
-    {
-      id: "0",
-      fromUser: "user1",
-      toUser: "user2",
+
+
+
+
+sf
+sfsv
+vsdvs
+
+dvdsvtoUser: "user2",
       value: 100,
       date: "10-10-10",
       type: "Cash-Out",
@@ -34,8 +44,7 @@ const Table: FC = () => {
       value: 100,
       date: "10-10-10",
       type: "Cash-In",
-    },
-    {
+    },    {
       id: "0",
       fromUser: "user1",
       toUser: "user2",
@@ -56,20 +65,16 @@ const Table: FC = () => {
   const [tableDate, setTable] = useState(data);
 
   const setFilter = (event: any) => {
-    console.log(event.target.value);
-    
-    if (event.target.value == "All") {
-      setTable(data);
-      return
-    }
     let type = String(event.target.value);
-    let filter: any = [];
-    data.map((row) => {
+    let filter: any = data.map((row) => {
       if (row.type == type) {
-        filter.push(row);
+        console.log(row);
+        return row
       }
     });
-    setTable(filter);
+    console.log(filter);
+    
+    setTable(filter)
   };
 
   return (

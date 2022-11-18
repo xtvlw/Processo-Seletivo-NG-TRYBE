@@ -16,12 +16,12 @@ const Header: FC = () => {
             </a>
           </li>
           <li className="nav-item">
-            <div  className="nav-link">
-              Historic
-            </div>
+            <div className="nav-link">Historic</div>
+          </li>
+          <li>
+            <button className="btn btn-outline-danger">Log out</button>
           </li>
         </ul>
-        <button className="btn btn-outline-danger">Log out</button>
       </header>
     </div>
   );
