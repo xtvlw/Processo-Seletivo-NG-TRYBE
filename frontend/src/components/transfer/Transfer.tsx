@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 
-const Transfer: FC = () => {
+const Header: FC = () => {
   return (
     <div className="container">
       <header className="d-flex justify-content-center py-3">
@@ -16,9 +16,9 @@ const Transfer: FC = () => {
             </a>
           </li>
           <li className="nav-item">
-            <a href="#" className="nav-link">
+            <div  className="nav-link">
               Historic
-            </a>
+            </div>
           </li>
         </ul>
         <button className="btn btn-outline-danger">Log out</button>
@@ -27,4 +27,4 @@ const Transfer: FC = () => {
   );
 };
 
-export default Transfer;
+export default Header;
