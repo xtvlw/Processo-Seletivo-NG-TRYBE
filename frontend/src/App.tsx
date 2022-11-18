@@ -1,19 +1,22 @@
 import React, { FC } from 'react';
-import'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // components
 import Sign from "./components/loginPage/Sign"
-import Table from "./components//main/Table"
-
+import Table from "./components/table/Table"
+import Transfer from './components/transfer/Transfer'
 // css
 import "./app.css"
 
 const App: FC = () => {
-  const isValid: boolean = false
+  const isValid: boolean = true
 
   return (
     <div className='center'>
-      {!isValid ? <Sign/> : <Table />}
+      {!isValid ? <Sign /> : <div>
+        <Transfer />
+        <Table />
+        </div>}
     </div>
   );
 }
