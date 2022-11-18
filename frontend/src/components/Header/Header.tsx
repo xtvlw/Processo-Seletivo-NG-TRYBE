@@ -1,4 +1,4 @@
-import React, { FC, FunctionComponent, useState } from "react";
+import React, { FC } from "react";
 
 const Header: FC = () => {
   return (
@@ -15,10 +15,7 @@ const Header: FC = () => {
               <a className="btn nav-link">New Transfer</a>
             </li>
             <li className="nav-item">
-              <a className="btn nav-link">Historic</a>
-            </li>
-            <li className="nav-item">
-              <a className="btn nav-link danger" style={{ color: "red" }}>
+              <a className="btn btn-outline-danger ">
                 Log out
               </a>
             </li>

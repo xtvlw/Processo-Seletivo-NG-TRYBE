@@ -21,12 +21,10 @@ const signUp: FC = () => {
   const [userInfo, setUserInfo] = useState({});
   const [UI, setUI] = useState(pageConfig[0]);
 
-
   // auxiliar functions
   const changeUI = () => {
     UI.newUser ? setUI(pageConfig[0]) : setUI(pageConfig[1]);
   };
-
 
   // interfaces
   interface eventType {
@@ -44,7 +42,6 @@ const signUp: FC = () => {
     newUser: boolean;
   }
 
-
   // changes anytime that the user update the form
   const getValues = (event: eventType) => {
     let swap: any = userInfo;
@@ -54,7 +51,6 @@ const signUp: FC = () => {
     console.log(userInfo);
   };
 
-
   // functions
   const sendData: Function = (userConfirm: UItype) => {
     fetch(userConfirm.host, {
@@ -62,7 +58,6 @@ const signUp: FC = () => {
       body: JSON.stringify(userInfo),
     });
   };
-
 
   // get from the bootstrap examples
   return (
@@ -113,10 +108,14 @@ const signUp: FC = () => {
         <button className="w-100 btn btn-lg btn-outline-primary" type="submit">
           {UI.footerUser}
         </button>
-        <small>
-          {UI.footer}
-          <p onClick={changeUI}>{UI.footerUser}</p>
-        </small>
+        <footer>
+          <p className="d-flex justify-content-center align-items-baseline">
+            {UI.footer}
+            <a style={{marginLeft: "5px"}} href="#" className="nav-item" onClick={changeUI}>
+              {UI.footerUser}
+            </a>
+          </p>
+        </footer>
       </form>
     </div>
   );
