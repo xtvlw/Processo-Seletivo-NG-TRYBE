@@ -11,19 +11,18 @@ server.use(express.urlencoded());
 server.get("/", async (req: Request, res: Response) => {
   res.send({
     status: 200,
-    query_result: await exec.createUser({ username: "a", password: "a" }),
+    query_result: "done"
   });
 });
 
 server.post("/newUser", async (req: Request, res: Response) => {
-  res.send({
-    status: 200,
-    opetation: "done",
-  });
+  let result = await exec.createUser(req.body)
+  res.send(result);
 });
 
-server.post("/getTransfers", async (req: Request, res: Response) => {
-  res.send(req.body);
+server.post("/makeTransfer", async (req: Request, res: Response) => {
+  let result = await exec.makeTransaction(req.body)
+  res.send(result);
 });
 
 server.listen(port, async () => {

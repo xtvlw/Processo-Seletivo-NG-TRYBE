@@ -17,7 +17,7 @@ client.connect((err) => {
 const pool = new Pool();
 
 // create all the tables
-const tables = () => {
+const tables = (): void => {
   client.query(`CREATE TABLE IF NOT EXISTS Users (
     id varchar(255) NOT NULL UNIQUE,
     username varchar(255) NOT NULL UNIQUE,
@@ -30,12 +30,12 @@ const tables = () => {
     balance int,
     PRIMARY KEY (id)
   )`);
-  client.query(`CREATE TABLE IF NOT EXISTS transaction (
+  client.query(`CREATE TABLE IF NOT EXISTS transactions (
     id varchar(255) NOT NULL UNIQUE,
-    debitedAccountId varchar(255) NOT NULL,
-    creditedAccountID varchar(255) NOT NULL,
+    debited_account_id varchar(255) NOT NULL,
+    credited_account_id varchar(255) NOT NULL,
     value int NOT NULL,
-    createdAt TIMESTAMPTZ DEFAULT Now() ,
+    created_at TIMESTAMPTZ DEFAULT Now() ,
     PRIMARY KEY (id)
   )`);
 };
@@ -53,8 +53,17 @@ interface Trasaction {
   value: number;
 }
 class execute {
+  // get the balance from some account; requires the id of the acccount
+  private getBalance = async (id: string): Promise<number> => {
+    let balance = await client.query(
+      `SELECT balance FROM accounts
+      WHERE (id='${id}')`
+    );
+    return balance.rows[0].balance;
+  };
+
   // create user, it's insert into users and accounts; requires username and password
-  createUser = async (config: createType): Promise<boolean> => {
+  createUser = async (config: createType): Promise<object> => {
     let accId = uuid();
     // insert values into users
     try {
@@ -73,21 +82,58 @@ class execute {
       VALUES ('${accId}',
         100)`);
     } catch {
-      return false;
+      return { status: "failed", reason: "username exists" };
     }
-    return true;
+    return { status: "sucess" };
   };
-  makeTransaction = async (info: Trasaction):Promise<boolean> => {
+
+  // register a new transaction into the database; also change balence from accoun table
+  makeTransaction = async (info: Trasaction): Promise<object> => {
     let id = uuid();
-    
+    // try insert the
     try {
-      await client.query(
-        `INSERT INTO transactions ()`
-      )
-    } catch {
-      return false
+      // variables to store user's new balance
+      let fromUserNewBalaance =
+        (await this.getBalance(info.fromUser)) - info.value;
+      let toUserNewBalance = (await this.getBalance(info.toUser)) + info.value;
+
+      // if user balance is less than 0, don't do the transfer
+      if (fromUserNewBalaance >= 0) {
+        // debite the value from the user account
+        await client.query(
+          `UPDATE accounts SET balance=${fromUserNewBalaance} WHERE (id='${info.fromUser}')`
+        );
+
+        // credit the value into the user account (send to the reciver)
+        await client.query(
+          `UPDATE accounts SET balance=${toUserNewBalance} WHERE (id='${info.toUser}')`
+        );
+
+        // insert the transfer detail into transaction table
+        await client.query(
+          `INSERT INTO transactions (id, debited_account_id, credited_account_id, value)
+        VALUES (
+          '${id}',
+          '${info.fromUser}',
+          '${info.toUser}',
+          ${info.value}
+          )`
+        );
+      } else {
+        // if debited user don't have balance to make the tranfer, the transfer will be denided
+        return {
+          status: "failed",
+          reason: "user does not have balance to carry out the transfer",
+        };
+      }
+    } catch (err) {
+      // any error will return { status: "failed" } and won't make the transfer
+      console.log(err);
+      return { status: "failed" };
     }
-    return true
+
+    // if everthing goes good return { status: "success" } and update the user's balance
+    return { status: "success" };
   };
 }
 
