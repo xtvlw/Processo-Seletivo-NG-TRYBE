@@ -57,6 +57,10 @@ interface createType {
   username: string;
   password: string;
 }
+interface loginType {
+  username: string;
+  password: string;
+}
 interface Trasaction {
   id: string;
   fromUser: string;
@@ -114,13 +118,35 @@ class execute {
       return { status: "failed", reason: "username exists" };
     }
     // if everthing goes good return { status: "sucess" }
-    return { status: "sucess" };
+    return { status: "sucess", username: config.username };
+  };
+
+  // login
+  login = async (config: loginType): Promise<object> => {
+    try {
+      // get user passsword from database
+      let user = await client.query(
+        `SELECT password FROM users WHERE (username='${config.username}')`
+      );
+      // verify if password math
+      if (user.rows[0].password == config.password) {
+        //return if password match
+        return { status: "sucess" };
+      } else {
+        // return if password don't match
+        return { status: "failed", reason: "password don't match" };
+      }
+    } catch (err) {
+      // if user don't exist will return this
+      console.log(err);
+      return { status: "failed", reason: "user don't have an account" };
+    }
   };
 
   // register a new transaction into the database; also change balence from accoun table
   makeTransaction = async (info: Trasaction): Promise<object> => {
     let id = uuid();
-    
+
     // if user try send to himself
     if (info.fromUser == info.toUser) {
       return { status: "failed", reason: "you can't sand money to yourself" };
