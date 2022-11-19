@@ -1,6 +1,7 @@
 import { Pool, Client } from "pg";
 import { v4 as uuid } from "uuid";
 
+// client config, presetting the values to access the database
 const client = new Client({
   database: "ng_data",
   user: "postgres",
@@ -14,10 +15,12 @@ client.connect((err) => {
   console.log("database is online");
 });
 
+// create pool to run query's
 const pool = new Pool();
 
 // create all the tables
 const tables = (): void => {
+  // create table users and set to have columns (id, username, password, accId)
   client.query(`CREATE TABLE IF NOT EXISTS Users (
     id varchar(255) NOT NULL UNIQUE,
     username varchar(255) NOT NULL UNIQUE,
@@ -25,11 +28,18 @@ const tables = (): void => {
     accId varchar(255) NOT NULL UNIQUE,
     PRIMARY KEY (id)
   )`);
+
+  // create table accounts and set to have columns (id, balance)
+  // note that accounts[id] and user[accId] are the same (one-to-one)
   client.query(`CREATE TABLE IF NOT EXISTS accounts (
     id varchar(255) NOT NULL UNIQUE,
     balance int,
     PRIMARY KEY (id)
   )`);
+
+  // create table transactions and set to have columns (id, debited_account_id, credited_account_id, value, created_at)
+  // note that create that are auto increment
+  // note: debited and credited columns are one-to-many of account[id]
   client.query(`CREATE TABLE IF NOT EXISTS transactions (
     id varchar(255) NOT NULL UNIQUE,
     debited_account_id varchar(255) NOT NULL,
@@ -42,6 +52,7 @@ const tables = (): void => {
 // create table users (if not exists it just ignore)
 tables();
 
+// interfaces for the methods from class execute
 interface createType {
   username: string;
   password: string;
@@ -67,6 +78,7 @@ class execute {
     let accId = uuid();
     // insert values into users
     try {
+      // create user into table user with the values from config
       await client.query(
         `INSERT INTO Users (id, username, password, accId) 
       VALUES (
@@ -76,14 +88,16 @@ class execute {
         '${accId}'
         )`
       );
-
+      // Add balance and accounid to the table account for the user
       await client.query(`
       INSERT INTO accounts (id, balance) 
       VALUES ('${accId}',
         100)`);
     } catch {
+      // if user already exists, return { status: "failed", reason: "username exists" }
       return { status: "failed", reason: "username exists" };
     }
+    // if everthing goes good return { status: "sucess" }
     return { status: "sucess" };
   };
 
