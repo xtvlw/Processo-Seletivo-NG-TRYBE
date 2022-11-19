@@ -122,7 +122,7 @@ class execute {
   };
 
   // login
-  login = async (config: loginType): Promise<object> => {
+  login = async (config: loginType): Promise<number> => {
     try {
       // get user passsword from database
       let user = await client.query(
@@ -131,15 +131,15 @@ class execute {
       // verify if password math
       if (user.rows[0].password == config.password) {
         //return if password match
-        return { status: "sucess" };
+        return 0;
       } else {
         // return if password don't match
-        return { status: "failed", reason: "password don't match" };
+        return 401;
       }
     } catch (err) {
       // if user don't exist will return this
       console.log(err);
-      return { status: "failed", reason: "user don't have an account" };
+      return 404;
     }
   };
 
