@@ -63,6 +63,14 @@ interface Trasaction {
   toUser: string;
   value: number;
 }
+interface getAllTypes {
+  id: string;
+  username: string;
+  accid: string;
+  balance: number;
+  transactions: object;
+}
+
 class execute {
   // get the balance from some account; requires the id of the acccount
   private getBalance = async (id: string): Promise<number> => {
@@ -71,6 +79,14 @@ class execute {
       WHERE (id='${id}')`
     );
     return balance.rows[0].balance;
+  };
+
+  // get all user transactions, requires the accountid
+  private getAllTransactions = async (id: string): Promise<object[]> => {
+    let transfers = await client.query(
+      `SELECT * FROM transactions WHERE (debited_account_id='${id}' OR credited_account_id='${id}');`
+    );
+    return transfers.rows;
   };
 
   // create user, it's insert into users and accounts; requires username and password
@@ -104,6 +120,12 @@ class execute {
   // register a new transaction into the database; also change balence from accoun table
   makeTransaction = async (info: Trasaction): Promise<object> => {
     let id = uuid();
+    
+    // if user try send to himself
+    if (info.fromUser == info.toUser) {
+      return { status: "failed", reason: "you can't sand money to yourself" };
+    }
+
     // try insert the
     try {
       // variables to store user's new balance
@@ -148,6 +170,40 @@ class execute {
 
     // if everthing goes good return { status: "success" } and update the user's balance
     return { status: "success" };
+  };
+
+  // return all the user info, (id, accid, balance, username and transactions the the user make part)
+  getAllData = async (username: string): Promise<object> => {
+    // get user data, (username, id, accid)
+    try {
+      let userData = await client.query(
+        `SELECT * from users WHERE (username='${username}');`
+      );
+
+      //get account information (accid, balance)
+      let userAccount = await client.query(
+        `SELECT * FROM accounts WHERE (id='${userData.rows[0].accid}')`
+      );
+
+      // get all transactions that the user make part
+      let userTransactions: object = await this.getAllTransactions(
+        userAccount.rows[0].id
+      );
+
+      // object with all user data, like (id, username, accountId, balance and the transactions)
+      let result: getAllTypes = {
+        id: userData.rows[0].id,
+        username: userData.rows[0].username,
+        accid: userAccount.rows[0].id,
+        balance: userAccount.rows[0].balance,
+        transactions: userTransactions,
+      };
+      // return an object with all user data
+      return result;
+    } catch (err) {
+      // return error because user don't exists
+      return { status: "failed", reason: "user don't exists" };
+    }
   };
 }
 
