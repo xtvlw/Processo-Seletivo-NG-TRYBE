@@ -1,12 +1,13 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import Home from "../Home/Home";
 import NewTransfer from "../newTransfer/NewTransfer";
 
 type Loads = {
   setLoader: React.ComponentState;
+  username: string;
 };
 
-const Header: React.FC<Loads> = ({ setLoader }) => {
+const Header: React.FC<Loads> = ({ setLoader, username}) => {
   return (
     <div className="container">
       <header className="d-flex justify-content-center py-3">
@@ -14,9 +15,8 @@ const Header: React.FC<Loads> = ({ setLoader }) => {
           <ul className="nav nav-pills">
             <li className="nav-item">
               <a
-                onClick={() => {
-                  setLoader(<Home name="as" balance={100} />);
-                }}
+                onClick={() =>
+                  setLoader(<Home name={username} />)                }
                 className="btn nav-link active"
                 aria-current="page"
               >

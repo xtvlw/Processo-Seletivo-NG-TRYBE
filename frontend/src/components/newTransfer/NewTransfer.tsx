@@ -9,7 +9,16 @@ export interface eventType {
 }
 
 const NewTransfer: React.FC = () => {
-  const [transferData, setTransferData] = useState({ fromUser: "a" });
+  const [transferData, setTransferData] = useState({ fromUser: "", value: 0 });
+
+  // get cookies and convert to object
+  const cookies: any = document.cookie
+    .split(";")
+    .map((item) => item.split("="))
+    .reduce(
+      (acc: any, [k, v]) => (acc[k.trim().replace('"', "")] = v) && acc,
+      {}
+    );
 
   const getValues = (event: eventType) => {
     let swap: any = transferData;
@@ -19,25 +28,29 @@ const NewTransfer: React.FC = () => {
   };
 
   const makeTransaction = async (): Promise<void> => {
-    let username = document.cookie.split(";")[0];
-    let fromUser = username[0];
-    fromUser = fromUser.split('=')[1]
-    setTransferData({
-      ...transferData,
-      fromUser: fromUser,
-    });
-    
-    
+    let swap = transferData
+    swap.value = Number(swap.value)
+    swap.fromUser = cookies.username
+
+    setTransferData(swap);
+
     let transaction = await fetch("http://localhost:4000/makeTransfer", {
       method: "POST",
       mode: "cors",
       headers: {
         "Content-Type": "application/json",
+        "x-access-token": cookies.token,
       },
       body: JSON.stringify(transferData),
     });
     let result = await transaction.json();
-    console.log(result);
+    let message;
+    if (result.reason == undefined) {
+      message = ''
+    } else {
+      message = result.reason
+    }
+    alert(`${result.status} \n${message}`)
   };
 
   return (
@@ -47,7 +60,7 @@ const NewTransfer: React.FC = () => {
         <span className="input-group-text">Username</span>
         <span className="input-group-text">@</span>
         <input
-          id="toUsername"
+          id="toUser"
           onChange={getValues}
           className="form-control"
           placeholder="Username"

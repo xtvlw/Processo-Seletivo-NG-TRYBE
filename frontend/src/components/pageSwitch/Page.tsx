@@ -1,15 +1,34 @@
-import { loadavg } from "os";
-import React, { useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import Header from "../Header/Header";
-import NewTransfer from "../newTransfer/NewTransfer";
 import Home from "../Home/Home";
 
-const Page: React.FC = () => {
-  const [transfer, setTransfer] = useState(false);
-  const [load, setLoad] = useState(<Home name="as" balance={100} />);
+interface user {
+  balance: number;
+  username: string;
+}
+
+const Page = (): any => {
+  var userInfo: user;
+  // create a object with all the data from cookies
+  const cookies: any = document.cookie
+    .split(";")
+    .map((item) => item.split("="))
+    .reduce(
+      (acc: any, [k, v]) => (acc[k.trim().replace('"', "")] = v) && acc,
+      {}
+    );
+
+  // loads the main page(home)
+  const [load, setLoad] = useState(
+    <Home name={cookies.username} />
+  );
+
   return (
     <div>
-      <Header setLoader={setLoad}/>
+      <Header
+        setLoader={setLoad}
+        username={cookies.username}
+      />
       <br />
       {load}
     </div>
