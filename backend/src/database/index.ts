@@ -66,6 +66,7 @@ interface Trasaction {
   fromUser: string;
   toUser: string;
   value: number;
+  password: string;
 }
 interface getAllTypes {
   id: string;
@@ -92,7 +93,47 @@ class execute {
     );
     return transfers.rows;
   };
+  // this method get the accountID or the username, depends of what you want
+  private getIds = async (username: string, accId: string): Promise<string> => {
+    if (accId === "") {
+      try {
+        let accounId = await client.query(
+          `SELECT accid FROM users WHERE (username='${username}')`
+        );
+        return await accounId.rows[0].accid;
+      } catch {
+        return "{status: 'failed', reason:'username don't exist'}";
+      }
+    } else {
+      try {
+        let user = await client.query(
+          `SELECT username from users WHERE (accid='${accId}')`
+        );
+        return await user.rows[0].username;
+      } catch {
+        return "error";
+      }
+    }
+  };
 
+  private passMatch = async (id: string, pass: string): Promise<boolean> => {
+    console.log(pass);
+    
+    try {
+      let result = await client.query(
+        `SELECT password FROM users WHERE (accid='${id}')`
+      );
+      let password = await result.rows[0].passsword;
+      if (pass == password) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch {
+      return false;
+    }
+  };
+  
   // create user, it's insert into users and accounts; requires username and password
   createUser = async (config: createType): Promise<object> => {
     let accId = uuid();
@@ -118,7 +159,7 @@ class execute {
       return { status: "failed", reason: "username exists" };
     }
     // if everthing goes good return { status: "sucess" }
-    return { status: "sucess", username: config.username };
+    return { status: "success", username: config.username };
   };
 
   // login
@@ -146,28 +187,34 @@ class execute {
   makeTransaction = async (info: Trasaction): Promise<object> => {
     let id = uuid();
 
+    let fromUser = await this.getIds(info.fromUser, "");
+    let toUser = await this.getIds(info.toUser, "");
+
+    if (await this.passMatch(fromUser, info.password)) {
+      return { status: "failed", reason: "password don't match" }
+    }
+
     // if user try send to himself
-    if (info.fromUser == info.toUser) {
+    if (fromUser == toUser) {
       return { status: "failed", reason: "you can't sand money to yourself" };
     }
 
     // try insert the
     try {
       // variables to store user's new balance
-      let fromUserNewBalaance =
-        (await this.getBalance(info.fromUser)) - info.value;
-      let toUserNewBalance = (await this.getBalance(info.toUser)) + info.value;
+      let fromUserNewBalaance = (await this.getBalance(fromUser)) - info.value;
+      let toUserNewBalance = (await this.getBalance(toUser)) + info.value;
 
       // if user balance is less than 0, don't do the transfer
       if (fromUserNewBalaance >= 0) {
         // debite the value from the user account
         await client.query(
-          `UPDATE accounts SET balance=${fromUserNewBalaance} WHERE (id='${info.fromUser}')`
+          `UPDATE accounts SET balance=${fromUserNewBalaance} WHERE (id='${fromUser}')`
         );
 
         // credit the value into the user account (send to the reciver)
         await client.query(
-          `UPDATE accounts SET balance=${toUserNewBalance} WHERE (id='${info.toUser}')`
+          `UPDATE accounts SET balance=${toUserNewBalance} WHERE (id='${toUser}')`
         );
 
         // insert the transfer detail into transaction table
@@ -175,8 +222,8 @@ class execute {
           `INSERT INTO transactions (id, debited_account_id, credited_account_id, value)
         VALUES (
           '${id}',
-          '${info.fromUser}',
-          '${info.toUser}',
+          '${fromUser}',
+          '${toUser}',
           ${info.value}
           )`
         );
@@ -189,7 +236,6 @@ class execute {
       }
     } catch (err) {
       // any error will return { status: "failed" } and won't make the transfer
-      console.log(err);
       return { status: "failed" };
     }
 

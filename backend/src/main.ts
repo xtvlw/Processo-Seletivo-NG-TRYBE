@@ -18,9 +18,13 @@ interface resultType {
 server.use(express.json());
 server.use(express.urlencoded());
 server.use(cors())
+
+
 const validaton = (req: Request, res: Response, next: NextFunction) => {
   let token = String(req.headers["x-access-token"]);
   verify(token, secret, (err) => {
+    console.log(err);
+    
     if (err) return res.status(401).end();
 
     next();
@@ -37,14 +41,15 @@ server.get("/", async (req: Request, res: Response) => {
 server.post("/login", async (req: Request, res: Response) => {
   let login = await exec.login(req.body);
   
-  
   if (login === 0) {
     let token = sign({ username: req.body.username }, secret, {
       expiresIn: 60 * 60 * 24,
     });
-    res.send({ auth: true, token: token });
+    
+    
+    res.send({ auth: true, token: token, username: req.body.username });
   }
-  res.send(login);
+  res.status(login);
 });
 
 server.post("/newUser", async (req: Request, res: Response) => {
