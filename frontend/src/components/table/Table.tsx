@@ -56,8 +56,6 @@ const Table: FC = () => {
   const [tableDate, setTable] = useState(data);
 
   const setFilter = (event: any) => {
-    console.log(event.target.value);
-    
     if (event.target.value == "All") {
       setTable(data);
       return

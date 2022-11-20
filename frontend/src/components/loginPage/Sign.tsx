@@ -2,19 +2,12 @@ import React, { FC, useState } from "react";
 import "./sign.css";
 
 // interfaces
-interface eventType {
+export interface eventType {
   target: targetType;
 }
 interface targetType {
   id: string;
   value: string;
-}
-interface UItype {
-  host: string;
-  title: string;
-  footerUser: string;
-  footer: string;
-  newUser: boolean;
 }
 interface isValidType {
   setValidation: React.ComponentState;
@@ -47,7 +40,7 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     },
   ];
   // states
-  const [userInfo, setUserInfo] = useState({ password: "" });
+  const [userInfo, setUserInfo] = useState({ password: "", username: "" });
   const [UI, setUI] = useState(pageConfig[0]);
   const [is_Pass_Valid, setIs_Pass_Valid] = useState("");
   // auxiliar functions
@@ -62,10 +55,11 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     return false;
   };
   // set cookies to the token
-  const setToken = (token: string): void => {
+  const setToken = (token: string, user: string): void => {
     let timer = new Date();
-    timer.setTime(timer.getTime() + 60 * 60 * 24);
-    document.cookie = `token=${token} ; expires=${timer.toUTCString()} ; path=/ng`;
+    timer.setTime(timer.getTime() + 60 * 60 * 24 * 1000);
+    document.cookie = `token=${token};expires=${timer.toUTCString()};`;
+    document.cookie = `username=${user};`
   };
 
   // changes anytime that the user update the form
@@ -74,7 +68,9 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     let elemId = event.target.id;
     swap[elemId] = event.target.value;
     if (
-      (swap.password != swap.confirm_password && swap.confirm_password != "") ||
+      (swap.password != swap.confirm_password &&
+        swap.confirm_password !== "" &&
+        swap.confirm_password !== undefined) ||
       !checkPass(swap.password)
     ) {
       setIs_Pass_Valid("notValid");
@@ -97,7 +93,9 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
       alert("user don't exist");
     } else {
       let resToken = await res.json();
-      setToken(resToken.token);
+      setToken(resToken.token, userInfo.username);
+      alert("you're logged now");
+      setValidation(true);
     }
   };
 
@@ -111,7 +109,11 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     let res = await (
       await fetch("http://localhost:4000/newUser", resConfig)
     ).json();
-    console.log(res);
+    if (res.states == "success") {
+      alert("user created, now you can login");
+    } else {
+      alert(`Error \n${res.reason}`);
+    }
   };
 
   // get from the bootstrap examples
