@@ -35,7 +35,6 @@ server.get("/", async (req: Request, res: Response) => {
 });
 
 server.post("/login", async (req: Request, res: Response) => {
-  console.log(req.body);
   let login = await exec.login(req.body);
   
   
