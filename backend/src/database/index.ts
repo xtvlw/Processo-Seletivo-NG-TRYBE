@@ -138,7 +138,6 @@ class execute {
       }
     } catch (err) {
       // if user don't exist will return this
-      console.log(err);
       return 404;
     }
   };
