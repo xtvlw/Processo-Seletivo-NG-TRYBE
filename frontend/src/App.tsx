@@ -8,9 +8,15 @@ import Page from "./components/pageSwitch/Page";
 import "./app.css";
 
 const App: FC = () => {
-  const [isValid, setValidation] = useState(false)
+  const [isValid, setValidation] = useState(() => {
+    let cookie = document.cookie
+    if (cookie !== '') {
+      return true
+    }
+    return false
+  })
 
-  
+
 
   return (
     <div className="center">
