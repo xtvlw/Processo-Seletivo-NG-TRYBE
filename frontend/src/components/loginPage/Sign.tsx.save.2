@@ -1,5 +1,4 @@
-import React, { FC, useState } from "react";
-import "./sign.css";
+eimport React, { FC, FormHTMLAttributes, useState } from "react";
 
 // interfaces
 interface eventType {
@@ -21,15 +20,6 @@ interface isValidType {
 }
 
 const signUp: React.FC<isValidType> = ({ setValidation }) => {
-  // request general
-  const resConfig: RequestInit = {
-    method: "POST",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
-
   const pageConfig = [
     {
       host: "/login",
@@ -47,25 +37,12 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     },
   ];
   // states
-  const [userInfo, setUserInfo] = useState({ password: "" });
+  const [userInfo, setUserInfo] = useState({});
   const [UI, setUI] = useState(pageConfig[0]);
-  const [is_Pass_Valid, setIs_Pass_Valid] = useState("");
-  // auxiliar functions
-  const changeUI = (): void => {
-    UI.newUser ? setUI(pageConfig[0]) : setUI(pageConfig[1]);
-  };
 
-  const checkPass = (pass: string) => {
-    if (pass.match(/[a-z]/g) && pass.match(/[A-Z]/g) && pass.match(/[0-9]/g)) {
-      return true;
-    }
-    return false;
-  };
-  // set cookies to the token
-  const setToken = (token: string): void => {
-    let timer = new Date();
-    timer.setTime(timer.getTime() + 60 * 60 * 24);
-    document.cookie = `token=${token} ; expires=${timer.toUTCString()} ; path=/ng`;
+  // auxiliar functions
+  const changeUI = () => {
+    UI.newUser ? setUI(pageConfig[0]) : setUI(pageConfig[1]);
   };
 
   // changes anytime that the user update the form
@@ -73,64 +50,42 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     let swap: any = userInfo;
     let elemId = event.target.id;
     swap[elemId] = event.target.value;
-    if (
-      (swap.password != swap.confirm_password && swap.confirm_password != "") ||
-      !checkPass(swap.password)
-    ) {
-      setIs_Pass_Valid("notValid");
-    } else {
-      setIs_Pass_Valid("");
-    }
     setUserInfo(swap);
   };
 
   // functions
-  const loginUser = async (): Promise<void> => {
-    if (!checkPass(userInfo.password)) {
-      alert("Password don't match requiriments");
-      return;
-    }
-
-    resConfig.body = JSON.stringify(userInfo);
-    let res = await fetch("http://localhost:4000/login", resConfig);
-    if (res.status == 404) {
-      alert("user don't exist");
-    } else {
-      let resToken = await res.json();
-      setToken(resToken.token);
-    }
-  };
-
-  // get values and create a new user
-  const newUser = async () => {
-    if (!checkPass(userInfo.password)) {
-      alert("Password don't match requiriments");
-      return;
-    }
-    resConfig.body = JSON.stringify(userInfo);
-    let res = await (
-      await fetch("http://localhost:4000/newUser", resConfig)
-    ).json();
-    console.log(res);
+  const loginUser = async () => {
+    const request = await fetch("http://0.0.0.0:4000/login", {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: "b",
+        password: "b"
+      }),
+    });
+    console.log(await request.json());
   };
 
   // get from the bootstrap examples
   return (
     <div className="text-center">
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable"></div>
+
       <h1>{UI.title}</h1>
       <form
-        onSubmit={UI.newUser ? loginUser : newUser}
+        onSubmit={loginUser}
         className="p-4 p-md-5 border rounded-3 bg-light"
       >
         <div className="form-floating mb-3">
           <input
-            title="Need's to be bigger than 2 characters"
             pattern="[a-zA-Z0-9]{3,}"
             required
             onChange={getValues}
             type="text"
-            className={"form-control "}
+            className="form-control"
             id="username"
             placeholder="Username"
           />
@@ -142,7 +97,7 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
             required
             onChange={getValues}
             type="password"
-            className={"form-control " + is_Pass_Valid}
+            className="form-control"
             id="password"
             placeholder="Password"
           />
@@ -155,17 +110,13 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
               required
               onChange={getValues}
               type="password"
-              className={"form-control " + is_Pass_Valid}
-              id="confirm_password"
+              className="form-control"
+              id="confirm-password"
               placeholder="Confirm Password"
             />
-            <label htmlFor="confirm_password">Confirm Password</label>
+            <label htmlFor="confirm-password">Confirm Password</label>
           </div>
         ) : null}
-        <p>
-          password must contain at least 1 number, 1 capital letter and have at
-          least 8 characters
-        </p>
         {UI.title}
         <button className="w-100 btn btn-lg btn-outline-primary" type="submit">
           {UI.footerUser}

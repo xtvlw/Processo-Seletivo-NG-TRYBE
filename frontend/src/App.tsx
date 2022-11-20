@@ -10,13 +10,12 @@ import Page from "./components/pageSwitch/Page";
 import "./app.css";
 
 const App: FC = () => {
-  const isValid: boolean = true;
-
+  const [isValid, setValidation] = useState(false)
 
   return (
     <div className="center">
       {!isValid ? (
-        <Sign />
+        <Sign setValidation={setValidation}/>
       ) : (
         <div>
           <Page />
