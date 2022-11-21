@@ -15,10 +15,14 @@ import cookies from "./modules/cookie";
 // main app component
 const App: React.FC = () => {
   const [isValid, setValidation] = useState(() => {
-    if (cookies.token == "" || cookies.token == undefined) {
+    try {
+      if (cookies.token == "" || cookies.token == undefined) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch {
       return false;
-    } else {
-      return true;
     }
   });
 

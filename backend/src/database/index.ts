@@ -2,6 +2,7 @@ import { Pool, Client } from "pg";
 import { v4 as uuid } from "uuid";
 import { createType, loginType, Trasaction, getAllTypes } from "./interfaces";
 import tables from "./tables";
+import hash from "../modules/hash";
 
 // client config, presetting the values to access the database
 export const client = new Client({
@@ -102,7 +103,7 @@ class execute {
       VALUES (
         '${uuid()}',
         '${config.username}',
-        '${config.password}',
+        '${hash(config.password)}',
         '${accId}'
         )`
       );
@@ -127,7 +128,7 @@ class execute {
         `SELECT password FROM users WHERE (username='${config.username}')`
       );
       // verify if password math
-      if (user.rows[0].password == config.password) {
+      if (user.rows[0].password == hash(config.password)) {
         //return if password match
         return 0;
       } else {
@@ -147,7 +148,7 @@ class execute {
     let fromUser = await this.getIds(info.fromUser, "");
     let toUser = await this.getIds(info.toUser, "");
 
-    if (await this.passMatch(fromUser, info.password)) {
+    if (await this.passMatch(fromUser, hash(info.password))) {
       return { status: "failed", reason: "password don't match" };
     }
 
