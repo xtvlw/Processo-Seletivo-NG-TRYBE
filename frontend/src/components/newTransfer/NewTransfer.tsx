@@ -1,5 +1,5 @@
-import React, { FC, useState } from "react";
-import cookies from '../../modules/cookie'
+import React, { useState } from "react";
+import cookies from "../../modules/cookie";
 
 interface targetType {
   id: string;
@@ -20,9 +20,9 @@ const NewTransfer: React.FC = () => {
   };
 
   const makeTransaction = async (): Promise<void> => {
-    let swap = transferData
-    swap.value = Number(swap.value)
-    swap.fromUser = cookies.username
+    let swap = transferData;
+    swap.value = Number(swap.value);
+    swap.fromUser = cookies.username;
 
     setTransferData(swap);
 
@@ -36,20 +36,20 @@ const NewTransfer: React.FC = () => {
       body: JSON.stringify(transferData),
     });
 
-    if(transaction.status == 401) {
-      alert("you need to login again!")
-      document.cookie = "token='';"
+    if (transaction.status == 401) {
+      alert("you need to login again!");
+      document.cookie = "token=;";
     }
 
     let result = await transaction.json();
-    
+
     let message;
     if (result.reason == undefined) {
-      message = ''
+      message = "";
     } else {
-      message = result.reason
+      message = result.reason;
     }
-    alert(`${result.status} \n${message}`)
+    alert(`${result.status} \n${message}`);
   };
 
   return (

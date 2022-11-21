@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { useState } from "react";
 import "./sign.css";
 
 // interfaces
@@ -43,8 +43,7 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
   const [userInfo, setUserInfo] = useState({ password: "", username: "" });
   const [UI, setUI] = useState(pageConfig[0]);
   const [is_Pass_Valid, setIs_Pass_Valid] = useState("");
-  
-  
+
   // auxiliar functions
   const changeUI = (): void => {
     UI.newUser ? setUI(pageConfig[0]) : setUI(pageConfig[1]);
@@ -61,7 +60,7 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     let timer = new Date();
     timer.setTime(timer.getTime() + 60 * 60 * 24 * 1000);
     document.cookie = `token=${token};expires=${timer.toUTCString()};`;
-    document.cookie = `username=${user};`
+    document.cookie = `username=${user};`;
   };
 
   // changes anytime that the user update the form
@@ -93,11 +92,14 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     let res = await fetch("http://localhost:4000/login", resConfig);
     if (res.status == 404) {
       alert("user don't exist");
+      return;
     } else {
       let resToken = await res.json();
       setToken(resToken.token, userInfo.username);
       alert("you're logged now");
-
+      setValidation(true);
+      location.reload();      
+      return;
     }
   };
 
@@ -111,7 +113,7 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
     let res = await (
       await fetch("http://localhost:4000/newUser", resConfig)
     ).json();
-    if (res.states == "success") {
+    if (res.status == "success") {
       alert("user created, now you can login");
     } else {
       alert(`Error \n${res.reason}`);

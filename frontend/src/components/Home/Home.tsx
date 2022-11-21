@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../table/Table";
-import cookies from '../../modules/cookie'
+import cookies from "../../modules/cookie";
 
 interface propsType {
   name: string;
@@ -10,12 +10,8 @@ const Home: React.FC<propsType> = ({ name }) => {
   const [showTable, setShoeTable] = useState(false);
   const [user, setUser] = useState({ balance: 0, transactions: [] });
 
-
-
   // make post request to get all user data
   useEffect(() => {
-    console.log(cookies.token);
-    
     if (user.balance == 0 && user.transactions.length == 0) {
       let transaction = fetch("http://localhost:4000/getAll", {
         method: "POST",
@@ -51,7 +47,7 @@ const Home: React.FC<propsType> = ({ name }) => {
       >
         {showTable ? "Hide History" : "Show History"}
       </button>
-      {showTable ? <Table rawData={user.transactions}/> : null}
+      {showTable ? <Table rawData={user.transactions} /> : null}
     </div>
   );
 };

@@ -15,25 +15,32 @@ import cookies from "./modules/cookie";
 // main app component
 const App: React.FC = () => {
   const [isValid, setValidation] = useState(() => {
-    if (cookies.token == '') {
+    if (cookies.token == "" || cookies.token == undefined) {
       return false;
+    } else {
+      return true;
     }
-    return true;
   });
 
   useEffect(() => {
-    if (cookies.token === '') {
+    try {
+      if (cookies.token == "" || cookies.token == undefined) {
+        setValidation(false);
+      } else {
+        setValidation(true);
+      }
+    } catch {
       setValidation(false);
     }
   });
   return (
     <div className="center">
-      {!isValid ? (
-        <Sign setValidation={setValidation} />
-      ) : (
+      {isValid ? (
         <div>
-          <Page />
+          <Page setValidation={setValidation} />
         </div>
+      ) : (
+        <Sign setValidation={setValidation} />
       )}
     </div>
   );

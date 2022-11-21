@@ -1,13 +1,14 @@
-import React, { FC, useState } from "react";
+import React from "react";
 import Home from "../Home/Home";
 import NewTransfer from "../newTransfer/NewTransfer";
 
 type Loads = {
   setLoader: React.ComponentState;
   username: string;
+  setValidation: React.ComponentState;
 };
 
-const Header: React.FC<Loads> = ({ setLoader, username}) => {
+const Header: React.FC<Loads> = ({ setValidation, setLoader, username }) => {
   return (
     <div className="container">
       <header className="d-flex justify-content-center py-3">
@@ -15,8 +16,7 @@ const Header: React.FC<Loads> = ({ setLoader, username}) => {
           <ul className="nav nav-pills">
             <li className="nav-item">
               <a
-                onClick={() =>
-                  setLoader(<Home name={username} />)                }
+                onClick={() => setLoader(<Home name={username} />)}
                 className="btn nav-link active"
                 aria-current="page"
               >
@@ -32,11 +32,17 @@ const Header: React.FC<Loads> = ({ setLoader, username}) => {
               </a>
             </li>
             <li className="nav-item">
-              <a onClick={() => {
-                document.cookie ="token='';"
-                alert("you're not logged")
-                location.reload()
-              }} className="btn btn-outline-danger ">Log out</a>
+              <a
+                onClick={() => {
+                  document.cookie = "token=;";
+                  alert("you're not logged anymore");
+                  setValidation(false);
+                  location.reload();
+                }}
+                className="btn btn-outline-danger "
+              >
+                Log out
+              </a>
             </li>
           </ul>
         </div>
