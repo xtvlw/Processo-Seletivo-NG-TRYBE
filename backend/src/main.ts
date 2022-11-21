@@ -59,6 +59,7 @@ server.post("/newUser", async (req: Request, res: Response) => {
 
 server.post("/makeTransfer", validaton, async (req: Request, res: Response) => {
   let result = await exec.makeTransaction(req.body);
+  console.log(result)
   res.send(result);
 });
 

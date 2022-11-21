@@ -85,14 +85,6 @@ class execute {
     );
     return balance.rows[0].balance;
   };
-
-  // get all user transactions, requires the accountid
-  private getAllTransactions = async (id: string): Promise<object[]> => {
-    let transfers = await client.query(
-      `SELECT * FROM transactions WHERE (debited_account_id='${id}' OR credited_account_id='${id}');`
-    );
-    return transfers.rows;
-  };
   // this method get the accountID or the username, depends of what you want
   private getIds = async (username: string, accId: string): Promise<string> => {
     if (accId === "") {
@@ -116,9 +108,22 @@ class execute {
     }
   };
 
+  // get all user transactions, requires the accountid
+  private getAllTransactions = async (id: string): Promise<object[]> => {
+    let transfers = await client.query(
+      `SELECT * FROM transactions WHERE (debited_account_id='${id}' OR credited_account_id='${id}');`
+    );
+    let newTransfer: any[] = []
+    for (let row in transfers.rows) {
+      let rowContent = transfers.rows[row];
+      rowContent.fromUser = await this.getIds('', rowContent.debited_account_id)
+      rowContent.toUser = await this.getIds('', rowContent.credited_account_id)
+      newTransfer.push(rowContent)
+    }
+    return newTransfer
+  };
+
   private passMatch = async (id: string, pass: string): Promise<boolean> => {
-    console.log(pass);
-    
     try {
       let result = await client.query(
         `SELECT password FROM users WHERE (accid='${id}')`
@@ -133,7 +138,7 @@ class execute {
       return false;
     }
   };
-  
+
   // create user, it's insert into users and accounts; requires username and password
   createUser = async (config: createType): Promise<object> => {
     let accId = uuid();
@@ -191,7 +196,7 @@ class execute {
     let toUser = await this.getIds(info.toUser, "");
 
     if (await this.passMatch(fromUser, info.password)) {
-      return { status: "failed", reason: "password don't match" }
+      return { status: "failed", reason: "password don't match" };
     }
 
     // if user try send to himself
