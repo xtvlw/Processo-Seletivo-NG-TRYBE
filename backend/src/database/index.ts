@@ -1,8 +1,10 @@
 import { Pool, Client } from "pg";
 import { v4 as uuid } from "uuid";
+import { createType, loginType, Trasaction, getAllTypes } from "./interfaces";
+import tables from "./tables";
 
 // client config, presetting the values to access the database
-const client = new Client({
+export const client = new Client({
   database: "ng_data",
   user: "postgres",
   password: "admin",
@@ -18,63 +20,10 @@ client.connect((err) => {
 // create pool to run query's
 const pool = new Pool();
 
-// create all the tables
-const tables = (): void => {
-  // create table users and set to have columns (id, username, password, accId)
-  client.query(`CREATE TABLE IF NOT EXISTS Users (
-    id varchar(255) NOT NULL UNIQUE,
-    username varchar(255) NOT NULL UNIQUE,
-    password varchar(255) NOT NULL,
-    accId varchar(255) NOT NULL UNIQUE,
-    PRIMARY KEY (id)
-  )`);
-
-  // create table accounts and set to have columns (id, balance)
-  // note that accounts[id] and user[accId] are the same (one-to-one)
-  client.query(`CREATE TABLE IF NOT EXISTS accounts (
-    id varchar(255) NOT NULL UNIQUE,
-    balance int,
-    PRIMARY KEY (id)
-  )`);
-
-  // create table transactions and set to have columns (id, debited_account_id, credited_account_id, value, created_at)
-  // note that create that are auto increment
-  // note: debited and credited columns are one-to-many of account[id]
-  client.query(`CREATE TABLE IF NOT EXISTS transactions (
-    id varchar(255) NOT NULL UNIQUE,
-    debited_account_id varchar(255) NOT NULL,
-    credited_account_id varchar(255) NOT NULL,
-    value int NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT Now() ,
-    PRIMARY KEY (id)
-  )`);
-};
 // create table users (if not exists it just ignore)
 tables();
 
 // interfaces for the methods from class execute
-interface createType {
-  username: string;
-  password: string;
-}
-interface loginType {
-  username: string;
-  password: string;
-}
-interface Trasaction {
-  id: string;
-  fromUser: string;
-  toUser: string;
-  value: number;
-  password: string;
-}
-interface getAllTypes {
-  id: string;
-  username: string;
-  accid: string;
-  balance: number;
-  transactions: object;
-}
 
 class execute {
   // get the balance from some account; requires the id of the acccount
@@ -113,14 +62,17 @@ class execute {
     let transfers = await client.query(
       `SELECT * FROM transactions WHERE (debited_account_id='${id}' OR credited_account_id='${id}');`
     );
-    let newTransfer: any[] = []
+    let newTransfer: any[] = [];
     for (let row in transfers.rows) {
       let rowContent = transfers.rows[row];
-      rowContent.fromUser = await this.getIds('', rowContent.debited_account_id)
-      rowContent.toUser = await this.getIds('', rowContent.credited_account_id)
-      newTransfer.push(rowContent)
+      rowContent.fromUser = await this.getIds(
+        "",
+        rowContent.debited_account_id
+      );
+      rowContent.toUser = await this.getIds("", rowContent.credited_account_id);
+      newTransfer.push(rowContent);
     }
-    return newTransfer
+    return newTransfer;
   };
 
   private passMatch = async (id: string, pass: string): Promise<boolean> => {
