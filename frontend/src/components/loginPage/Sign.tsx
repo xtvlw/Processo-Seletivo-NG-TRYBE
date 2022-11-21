@@ -97,7 +97,7 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
       let resToken = await res.json();
       setToken(resToken.token, userInfo.username);
       alert("you're logged now");
-      setValidation(true);
+
     }
   };
 

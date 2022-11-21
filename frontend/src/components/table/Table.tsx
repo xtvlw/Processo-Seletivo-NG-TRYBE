@@ -1,41 +1,55 @@
 import React, { FC, useState } from "react";
+import cookies from "../../modules/cookie";
 
 type table = {
   rawData: object[];
 };
 
 const Table: FC<table> = ({ rawData }) => {
-  const cookies: any = document.cookie
-    .split(";")
-    .map((item) => item.split("="))
-    .reduce(
-      (acc: any, [k, v]) => (acc[k.trim().replace('"', "")] = v) && acc,
-      {}
-    );
+  const [tableData, setTable] = useState(rawData);
 
-  const [tableData, setTable] = useState([{}]);
+  const dateFilter = (event: any) => {
+    let filter: object[] = [];
+    rawData.map((row: any) => {
+      let rowDate = new Date(row.created_at);
+      let inputDate = new Date(event.target.value);
+      if (
+        rowDate.getFullYear() === inputDate.getFullYear() &&
+        rowDate.getMonth() === inputDate.getMonth() &&
+        rowDate.getDate() === inputDate.getDate()
+      ) {
+        filter.push(row);
+      }
+    });
+    setTable(filter);
+  };
 
   const filter = (event: any): void => {
     let newTable: any[] = [];
     let swap: any;
+
+    if (event.target.value == "All") {
+      setTable(rawData);
+      return
+    }
+
     for (let i in rawData) {
       swap = rawData[i];
       if (swap.fromUser == cookies.username) {
-        swap.type = "cash-out";
+        swap.type = "Cash-Out";
       } else {
-        swap.type = "cash-in";
+        swap.type = "Cash-In";
       }
       newTable.push(swap);
     }
-    if (event.target.value == "All") {
-      setTable(newTable)
-    }
+
+    let filter: object[] = [];
     newTable.map((row: any) => {
       if (row.type == event.target.value) {
-        return row;
+        filter.push(row);
       }
     });
-    setTable(newTable);
+    setTable(filter);
   };
 
   return (
@@ -48,7 +62,12 @@ const Table: FC<table> = ({ rawData }) => {
             <option value="Cash-In">Cash-In</option>
             <option value="Cash-Out">Cash-Out</option>
           </select>
-          <input className="input-group-text" id="date" type="date" />
+          <input
+            onChange={dateFilter}
+            className="input-group-text"
+            id="date"
+            type="date"
+          />
         </div>
       </div>
       <br />
@@ -65,7 +84,7 @@ const Table: FC<table> = ({ rawData }) => {
         <tbody>
           {tableData.map((row: any) => {
             return (
-              <tr key={row.id}>
+              <tr key={Math.random().toString()}>
                 <td>{row.id}</td>
                 <td>{row.fromUser}</td>
                 <td>{row.toUser}</td>
@@ -75,7 +94,11 @@ const Table: FC<table> = ({ rawData }) => {
                     currency: "BRL",
                   }).format(row.value)}
                 </td>
-                <td>{row.created_at}</td>
+                <td>
+                  {`${new Date(row.created_at).getFullYear()}/${new Date(
+                    row.created_at
+                  ).getMonth()}/${new Date(row.created_at).getDay()}`}
+                </td>
               </tr>
             );
           })}

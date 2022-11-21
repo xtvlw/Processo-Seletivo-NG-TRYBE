@@ -14,6 +14,8 @@ const Home: React.FC<propsType> = ({ name }) => {
 
   // make post request to get all user data
   useEffect(() => {
+    console.log(cookies.token);
+    
     if (user.balance == 0 && user.transactions.length == 0) {
       let transaction = fetch("http://localhost:4000/getAll", {
         method: "POST",
