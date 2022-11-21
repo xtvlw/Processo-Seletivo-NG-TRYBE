@@ -1,73 +1,41 @@
-import { eventWrapper } from "@testing-library/user-event/dist/utils";
 import React, { FC, useState } from "react";
 
-const Table: FC = () => {
-  const data = [
-    {
-      id: "0",
-      fromUser: "user1",
-      toUser: "user2",
-      value: 100,
-      date: "10-10-10",
-      type: "Cash-Out",
-    },
-    {
-      id: "1",
-      fromUser: "user3",
-      toUser: "user4",
-      value: 100,
-      date: "10-10-10",
-      type: "Cash-In",
-    },
-    {
-      id: "0",
-      fromUser: "user1",
-      toUser: "user2",
-      value: 100,
-      date: "10-10-10",
-      type: "Cash-Out",
-    },
-    {
-      id: "1",
-      fromUser: "user3",
-      toUser: "user4",
-      value: 100,
-      date: "10-10-10",
-      type: "Cash-In",
-    },
-    {
-      id: "0",
-      fromUser: "user1",
-      toUser: "user2",
-      value: 100,
-      date: "10-10-10",
-      type: "Cash-Out",
-    },
-    {
-      id: "1",
-      fromUser: "user3",
-      toUser: "user4",
-      value: 100,
-      date: "10-10-10",
-      type: "Cash-In",
-    },
-  ];
+type table = {
+  rawData: object[];
+};
 
-  const [tableDate, setTable] = useState(data);
+const Table: FC<table> = ({ rawData }) => {
+  const cookies: any = document.cookie
+    .split(";")
+    .map((item) => item.split("="))
+    .reduce(
+      (acc: any, [k, v]) => (acc[k.trim().replace('"', "")] = v) && acc,
+      {}
+    );
 
-  const setFilter = (event: any) => {
-    if (event.target.value == "All") {
-      setTable(data);
-      return
+  const [tableData, setTable] = useState([{}]);
+
+  const filter = (event: any): void => {
+    let newTable: any[] = [];
+    let swap: any;
+    for (let i in rawData) {
+      swap = rawData[i];
+      if (swap.fromUser == cookies.username) {
+        swap.type = "cash-out";
+      } else {
+        swap.type = "cash-in";
+      }
+      newTable.push(swap);
     }
-    let type = String(event.target.value);
-    let filter: any = [];
-    data.map((row) => {
-      if (row.type == type) {
-        filter.push(row);
+    if (event.target.value == "All") {
+      setTable(newTable)
+    }
+    newTable.map((row: any) => {
+      if (row.type == event.target.value) {
+        return row;
       }
     });
-    setTable(filter);
+    setTable(newTable);
   };
 
   return (
@@ -75,40 +43,39 @@ const Table: FC = () => {
       <div id="filter" className="center space-between">
         <h1>Filter</h1>
         <div className="input-group mb-3">
-          <select onChange={setFilter} className="form-select dropdown-toggle">
+          <select onChange={filter} className="form-select dropdown-toggle">
             <option value="All">All</option>
             <option value="Cash-In">Cash-In</option>
             <option value="Cash-Out">Cash-Out</option>
           </select>
-          <input
-            className="input-group-text"
-            id="date"
-            onChange={setFilter}
-            type="date"
-          />
+          <input className="input-group-text" id="date" type="date" />
         </div>
       </div>
       <br />
       <table className="table table-bordered">
-        <tbody>
+        <thead>
           <tr>
             <td>#</td>
-            <td>Type</td>
+            <td>Sender</td>
+            <td>Reciver</td>
             <td>Value</td>
             <td>Date</td>
           </tr>
-
-          {tableDate.map((row) => {
-            let value = new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(row.value);
+        </thead>
+        <tbody>
+          {tableData.map((row: any) => {
             return (
-              <tr key={Math.random()}>
+              <tr key={row.id}>
                 <td>{row.id}</td>
-                <td>{row.type}</td>
-                <td>{value}</td>
-                <td>{row.date}</td>
+                <td>{row.fromUser}</td>
+                <td>{row.toUser}</td>
+                <td>
+                  {new Intl.NumberFormat("pt-br", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(row.value)}
+                </td>
+                <td>{row.created_at}</td>
               </tr>
             );
           })}

@@ -43,6 +43,8 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
   const [userInfo, setUserInfo] = useState({ password: "", username: "" });
   const [UI, setUI] = useState(pageConfig[0]);
   const [is_Pass_Valid, setIs_Pass_Valid] = useState("");
+  
+  
   // auxiliar functions
   const changeUI = (): void => {
     UI.newUser ? setUI(pageConfig[0]) : setUI(pageConfig[1]);

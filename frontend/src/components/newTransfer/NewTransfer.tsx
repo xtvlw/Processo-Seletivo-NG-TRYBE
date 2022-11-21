@@ -1,4 +1,5 @@
 import React, { FC, useState } from "react";
+import cookies from '../../modules/cookie'
 
 interface targetType {
   id: string;
@@ -10,15 +11,6 @@ export interface eventType {
 
 const NewTransfer: React.FC = () => {
   const [transferData, setTransferData] = useState({ fromUser: "", value: 0 });
-
-  // get cookies and convert to object
-  const cookies: any = document.cookie
-    .split(";")
-    .map((item) => item.split("="))
-    .reduce(
-      (acc: any, [k, v]) => (acc[k.trim().replace('"', "")] = v) && acc,
-      {}
-    );
 
   const getValues = (event: eventType) => {
     let swap: any = transferData;
@@ -43,7 +35,14 @@ const NewTransfer: React.FC = () => {
       },
       body: JSON.stringify(transferData),
     });
+
+    if(transaction.status == 401) {
+      alert("you need to login again!")
+      document.cookie = "token='';"
+    }
+
     let result = await transaction.json();
+    
     let message;
     if (result.reason == undefined) {
       message = ''

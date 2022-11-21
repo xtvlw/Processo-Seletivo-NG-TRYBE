@@ -32,7 +32,11 @@ const Header: React.FC<Loads> = ({ setLoader, username}) => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="btn btn-outline-danger ">Log out</a>
+              <a onClick={() => {
+                document.cookie ="token='';"
+                alert("you're not logged")
+                location.reload()
+              }} className="btn btn-outline-danger ">Log out</a>
             </li>
           </ul>
         </div>
