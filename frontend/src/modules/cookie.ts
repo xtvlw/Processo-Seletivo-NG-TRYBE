@@ -1,3 +1,5 @@
+
+
 const cookies: any = document.cookie
   .split(";")
   .map((item) => item.split("="))
@@ -5,5 +7,6 @@ const cookies: any = document.cookie
     (acc: any, [k, v]) => (acc[k.trim().replace('"', "")] = v) && acc,
     {}
   );
+console.log(cookies);
 
-export default cookies
+export default cookies;

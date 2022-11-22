@@ -10,7 +10,7 @@ export const client = new Client({
   user: "postgres",
   password: "admin",
   port: 5432,
-  host: "localhost",
+  host: "0.0.0.0",
 });
 
 client.connect((err) => {

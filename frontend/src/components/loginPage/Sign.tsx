@@ -110,6 +110,7 @@ const signUp: React.FC<isValidType> = ({ setValidation }) => {
       return;
     }
     resConfig.body = JSON.stringify(userInfo);
+    
     let res = await (
       await fetch("http://localhost:4000/newUser", resConfig)
     ).json();
